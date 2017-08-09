@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 
-class m170809_171829_addcolumnto_table_user extends Migration
+class m170809_171829_add_column_to_table_user extends Migration
 {
 
     public function up()
