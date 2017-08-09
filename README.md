@@ -1,6 +1,6 @@
 YII2 TEST APPLICATION
 ------------
-### Install
+### Requirements
 * php >= 5.4.0
 * mysql
 ### Install
