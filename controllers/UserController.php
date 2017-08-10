@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\LoginForm;
 use Yii;
 use app\models\User;
+use yii\caching\DbDependency;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -71,9 +72,19 @@ class UserController extends Controller
      */
     public function actionIndex()
     {
+        $app = Yii::$app;
+        $users = User::find();
         $dataProvider = new ActiveDataProvider([
-            'query' => User::find(),
+            'query' => $users,
         ]);
+
+        $dependency = new DbDependency([
+            'sql' => 'SELECT MAX(updated_at) FROM user'
+        ]);
+
+        $app->db->cache(function () use ($dataProvider) {
+            $dataProvider->prepare();
+        }, $app->params['cache_expire'], $dependency);
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
@@ -149,16 +160,8 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post())) {
-            $password = Yii::$app->request->post('User')['password'];
-            if (!empty($password)) {
-                $model->setPassword($password);
-            }
-
-            if ($model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
                 'model' => $model,

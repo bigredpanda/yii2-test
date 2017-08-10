@@ -17,7 +17,9 @@ class m170809_171641_create_user_table extends Migration
             'email'    => $this->string(32)->unique()->notNull(),
             'auth_key' => $this->string(),
             'username' => $this->string(32)->unique()->notNull(),
-            'password' => $this->string(128)->notNull()
+            'password' => $this->string(128)->notNull(),
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
         ]);
     }
 

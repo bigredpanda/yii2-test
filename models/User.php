@@ -5,6 +5,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\NotSupportedException;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
@@ -17,6 +18,8 @@ use yii\web\IdentityInterface;
  * @property string $auth_key
  * @property string $password
  * @property string $type
+ * @property int created_at
+ * @property int updated_at
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -38,6 +41,13 @@ class User extends ActiveRecord implements IdentityInterface
         return 'user';
     }
 
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::className(),
+        ];
+    }
+
     /**
      * @return array
      */
@@ -45,7 +55,8 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['email', 'password', 'username'], 'required'],
-            [['email', 'username', 'email'], 'string', 'max' => 128],
+            [['email', 'username'], 'string', 'max' => 32],
+            ['password', 'string', 'max' => 128],
             [['email', 'username', 'email'], 'unique'],
             ['email', 'email'],
             ['type', 'in', 'range' => array_keys(self::getTypes())]

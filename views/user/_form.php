@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'password')->passwordInput(['value' => '']) ?>
+    <?= ($model->isNewRecord) ? $form->field($model, 'password')->passwordInput(['value' => '']) : '' ?>
 
     <?= $form->field($model, 'type')->dropDownList($model->getTypes()) ?>
 
