@@ -9,7 +9,7 @@ YII2 TEST APPLICATION
 * cd yii2-test
 * composer install
 * set you database parameters in config/db.php and 
-* php yii migrate
 * php yii migrate --migrationPath=@yii/rbac/migrations
 * php yii rbac/init
+* php yii migrate
 * open in browser :)
