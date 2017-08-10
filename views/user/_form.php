@@ -18,7 +18,8 @@ use yii\widgets\ActiveForm;
 
     <?= ($model->isNewRecord) ? $form->field($model, 'password')->passwordInput(['value' => '']) : '' ?>
 
-    <?= $form->field($model, 'type')->dropDownList($model->getTypes()) ?>
+    <?= HTML::label('Roles') ?>
+    <?= Html::dropDownList('role', '', $roles, ['class' => 'form-group form-control']) ?>
 
     <div class="form-group">
         <?=

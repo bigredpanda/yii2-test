@@ -38,24 +38,14 @@ class UserController extends Controller
                 'only'  => ['update', 'delete', 'create', 'view', 'index'],
                 'rules' => [
                     [
-                        'actions'       => ['update', 'delete', 'create'],
-                        'allow'         => true,
-                        'roles'         => ['@'],
-                        'matchCallback' => function () {
-                            return (Yii::$app->user->identity->type == User::ADMIN);
-
-                        }
+                        'actions' => ['update', 'delete', 'create'],
+                        'allow'   => true,
+                        'roles'   => ['admin']
                     ],
                     [
-                        'actions'       => ['index', 'view'],
-                        'allow'         => true,
-                        'roles'         => ['@'],
-                        'matchCallback' => function () {
-                            return (
-                                Yii::$app->user->identity->type == User::TEACHER
-                                || Yii::$app->user->identity->type == User::ADMIN
-                            );
-                        }
+                        'actions' => ['index', 'view'],
+                        'allow'   => true,
+                        'roles'   => ['teacher']
                     ],
                     [
                         'actions' => ['logout'],
@@ -106,6 +96,65 @@ class UserController extends Controller
     /**
      * @return string|Response
      */
+    public function actionCreate()
+    {
+        $model = new User();
+        $post = Yii::$app->request->post();
+
+        if ($model->load($post)) {
+            $password = $post['User']['password'];
+            $model->setPassword($password);
+
+            if ($model->save()) {
+                $model->setRole($post['role']);
+
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+            'roles' => $this->getRoles()
+        ]);
+    }
+
+    /**
+     * @param int $id
+     * @return string|Response
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+        $post = Yii::$app->request->post();
+        if ($model->load($post) && $model->save()) {
+            $model->setRole($post['role']);
+
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('update', [
+                'model' => $model,
+                'roles' => $this->getRoles()
+            ]);
+        }
+    }
+
+    /**
+     * @param int $id
+     * @return Response
+     */
+    public function actionDelete($id)
+    {
+        if ($this->findModel($id)->delete()) {
+            $authManager = Yii::$app->authManager;
+            $authManager->revokeAll($id);
+        };
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * @return string|Response
+     */
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
@@ -123,27 +172,6 @@ class UserController extends Controller
     }
 
     /**
-     * @return string|Response
-     */
-    public function actionCreate()
-    {
-        $model = new User();
-
-        $post = Yii::$app->request->post();
-        if ($model->load($post)) {
-            $password = $post['User']['password'];
-            $model->setPassword($password);
-            if ($model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
      * @return Response
      */
     public function actionLogout()
@@ -153,32 +181,19 @@ class UserController extends Controller
         return $this->goHome();
     }
 
-    /**
-     * @param int $id
-     * @return string|Response
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
-    }
 
     /**
-     * @param int $id
-     * @return Response
+     * @return array
      */
-    public function actionDelete($id)
+    private function getRoles()
     {
-        $this->findModel($id)->delete();
+        $roles = array_map(function ($r) {
+            return $r->name;
+        }, Yii::$app->authManager->getRoles());
 
-        return $this->redirect(['index']);
+        return $roles;
     }
+
 
     /**
      * @param int $id

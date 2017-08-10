@@ -17,22 +17,11 @@ use yii\web\IdentityInterface;
  * @property string $username
  * @property string $auth_key
  * @property string $password
- * @property string $type
  * @property int created_at
  * @property int updated_at
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    const STUDENT = 'student';
-    const TEACHER = 'teacher';
-    const ADMIN = 'admin';
-
-    public static $types = [
-        self::STUDENT => 'student',
-        self::TEACHER => 'teacher',
-        self::ADMIN   => 'admin'
-    ];
-
     /**
      * @return string
      */
@@ -58,8 +47,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['email', 'username'], 'string', 'max' => 32],
             ['password', 'string', 'max' => 128],
             [['email', 'username', 'email'], 'unique'],
-            ['email', 'email'],
-            ['type', 'in', 'range' => array_keys(self::getTypes())]
+            ['email', 'email']
         ];
     }
 
@@ -72,8 +60,7 @@ class User extends ActiveRecord implements IdentityInterface
             'id'       => 'ID',
             'email'    => 'Email',
             'password' => 'Password',
-            'username' => 'Username',
-            'type'     => 'Type'
+            'username' => 'Username'
         ];
     }
 
@@ -124,17 +111,13 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getType()
+    public function getUserName()
     {
-        return $this->type;
+        return $this->username;
     }
 
-    public static function getTypes()
-    {
-        return self::$types;
-    }
 
     /**
      * @param $password
@@ -150,6 +133,18 @@ class User extends ActiveRecord implements IdentityInterface
     public function setUsername($username)
     {
         $this->username = $username;
+    }
+
+    /**
+     * @param $roleName
+     */
+    public function setRole($roleName)
+    {
+        $authManager = Yii::$app->authManager;
+        $userId = $this->getId();
+        $authManager->revokeAll($userId);
+        $role = $authManager->getRole($roleName);
+        $authManager->assign($role, $userId);
     }
 
     /**

@@ -1,24 +1,22 @@
 <?php
 
+use app\models\User;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\User */
+/* @var $model app\models\Note */
 
-$this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
+$this->title = $model->title;
+$this->params['breadcrumbs'][] = ['label' => 'Notes', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="user-view">
+<div class="note-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], [
-            'class' => 'btn btn-primary',
-        ]) ?>
-
+        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data'  => [
@@ -32,9 +30,18 @@ $this->params['breadcrumbs'][] = $this->title;
         'model'      => $model,
         'attributes' => [
             'id',
-            'email:email',
-            'username'
+            'title',
+            'message',
+            [
+                'label' => 'Author',
+                'value' => function ($model) {
+                    $author = User::findOne($model->author);
+
+                    return $author ? $author['username'] : '';
+                },
+            ]
         ],
+
     ]) ?>
 
 </div>

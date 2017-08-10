@@ -4,25 +4,28 @@ $params = require(__DIR__ . '/params.php');
 $db = require(__DIR__ . '/db.php');
 
 $config = [
-    'id' => 'basic-console',
-    'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'id'                  => 'basic-console',
+    'basePath'            => dirname(__DIR__),
+    'bootstrap'           => ['log'],
     'controllerNamespace' => 'app\commands',
-    'components' => [
-        'cache' => [
+    'components'          => [
+        'cache'       => [
             'class' => 'yii\caching\FileCache',
         ],
-        'log' => [
+        'log'         => [
             'targets' => [
                 [
-                    'class' => 'yii\log\FileTarget',
+                    'class'  => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
             ],
         ],
-        'db' => $db,
+        'db'          => $db,
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager'
+        ],
     ],
-    'params' => $params,
+    'params'              => $params,
     /*
     'controllerMap' => [
         'fixture' => [ // Fixture generation command line.
