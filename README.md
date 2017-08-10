@@ -1,6 +1,6 @@
 YII2 TEST APPLICATION
 ------------
-### Install
+### Requirements
 * php >= 5.4.0
 * mysql
 ### Install
@@ -9,5 +9,5 @@ YII2 TEST APPLICATION
 * cd yii2-test
 * composer install
 * set you database parameters in config/db.php and 
-* perform "php yii migrate" in console from project root directory
+* php yii migrate
 * open in browser :)
