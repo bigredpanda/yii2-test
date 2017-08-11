@@ -19,7 +19,7 @@ class m170810_173426_create_note_table extends Migration
             'author'  => $this->integer()->notNull()
         ]);
 
-        $this->addForeignKey('user', 'note', 'author', 'user', 'id');
+        $this->addForeignKey('FK_note_author', 'note', 'author', 'user', 'id');
     }
 
     /**
