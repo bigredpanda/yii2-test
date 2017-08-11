@@ -71,6 +71,7 @@ class UserController extends Controller
         $dependency = new DbDependency([
             'sql' => 'SELECT MAX(updated_at) FROM user'
         ]);
+        $dependency->reusable = true;
 
         $app->db->cache(function () use ($dataProvider) {
             $dataProvider->prepare();

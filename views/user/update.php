@@ -5,6 +5,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
+/* @var $roles array */
 
 $this->title = 'Update';
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
