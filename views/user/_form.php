@@ -6,6 +6,10 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 /* @var $form yii\widgets\ActiveForm */
+
+$userId = $model->getId();
+$userRoles = array_keys(Yii::$app->authManager->getRolesByUser($userId));
+$userRoleName = (isset($userRoles[0])) ? $userRoles[0] : '';
 ?>
 
 <div class="user-form">
@@ -19,7 +23,7 @@ use yii\widgets\ActiveForm;
     <?= ($model->isNewRecord) ? $form->field($model, 'password')->passwordInput(['value' => '']) : '' ?>
 
     <?= HTML::label('Roles') ?>
-    <?= Html::dropDownList('role', '', $roles, ['class' => 'form-group form-control']) ?>
+    <?= Html::dropDownList('role', $userRoleName, $roles, ['class' => 'form-group form-control']) ?>
 
     <div class="form-group">
         <?=

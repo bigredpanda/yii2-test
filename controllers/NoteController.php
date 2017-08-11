@@ -30,12 +30,8 @@ class NoteController extends Controller
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only'  => ['index', 'update', 'delete'],
+                'only'  => ['index'],
                 'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['admin']
-                    ],
                     [
                         'actions' => ['index'],
                         'allow'   => true,
@@ -55,6 +51,7 @@ class NoteController extends Controller
     {
         $app = Yii::$app;
         $user = $app->getUser();
+
         if ($user->can('admin')) {
             $notes = Note::find();
         } else {
@@ -79,11 +76,12 @@ class NoteController extends Controller
      */
     public function actionView($id)
     {
-        $note = $this->findModel($id);
+        $noteModel = $this->findModel($id);
         $user = Yii::$app->user;
-        if ($user->can('viewNote', ['note' => $note])) {
+
+        if ($user->can('viewNote', ['note' => $noteModel])) {
             return $this->render('view', [
-                'model' => $note,
+                'model' => $noteModel,
             ]);
         } else {
             throw new ForbiddenHttpException('You do not have permission to view this note');
@@ -95,17 +93,23 @@ class NoteController extends Controller
      * Creates a new Note model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
+     * @throws ForbiddenHttpException
      */
     public function actionCreate()
     {
-        $model = new Note();
+        $noteModel = new Note();
+        $user = Yii::$app->user;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($user->can('createNote', ['note' => $noteModel])) {
+            if ($noteModel->load(Yii::$app->request->post()) && $noteModel->save()) {
+                return $this->redirect(['view', 'id' => $noteModel->id]);
+            } else {
+                return $this->render('create', [
+                    'model' => $noteModel,
+                ]);
+            }
         } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            throw new ForbiddenHttpException('You do not have permission to view this note');
         }
     }
 
@@ -114,17 +118,23 @@ class NoteController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
+     * @throws ForbiddenHttpException
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $noteModel = $this->findModel($id);
+        $user = Yii::$app->user;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($user->can('editAndDeleteNote', ['note' => $noteModel])) {
+            if ($noteModel->load(Yii::$app->request->post()) && $noteModel->save()) {
+                return $this->redirect(['view', 'id' => $noteModel->id]);
+            } else {
+                return $this->render('update', [
+                    'model' => $noteModel,
+                ]);
+            }
         } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            throw new ForbiddenHttpException('You do not have permission to view this note');
         }
     }
 
@@ -133,10 +143,18 @@ class NoteController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
+     * @throws ForbiddenHttpException
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $noteModel = $this->findModel($id);
+        $user = Yii::$app->user;
+
+        if ($user->can('editAndDeleteNote', ['note' => $noteModel])) {
+            $noteModel->delete();
+        } else {
+            throw new ForbiddenHttpException('You do not have permission to view this note');
+        }
 
         return $this->redirect(['index']);
     }
